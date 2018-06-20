@@ -7,18 +7,17 @@ precision mediump float;
 uniform vec2 iResolution;
 uniform vec2 iMouse;
 uniform float iTime;
+uniform bool iCam;
 
 #define EPS      0.0001
 #define STEPS       100
 #define FAR       10.0
 #define PI acos( -1.0 )
 #define TPI    PI * 2.0
-// Folding and depth of recursive primitive
+// Folding depth
 #define FRACTALITERATIONS 6
 // Uncomment to get real reflections
 //#define REFLECTIONS
-// Comment to change camera
-//#define CAMERA
 // Comment to change colours
 #define COLOR
 
@@ -198,11 +197,22 @@ void main( )
     
     vec2 mou = iMouse.xy / iResolution.xy;
     
-#ifdef CAMERA
-    vec3 ro = 0.2 * vec3( sin( iTime * 0.1 ), 0.0, cos( iTime * 0.1 ) );
-#else
-    vec3 ro = vec3( 0.0, 0.2 * cos( iTime * 0.1  ), 1.0 + sin( iTime * 0.1 ) );
-#endif
+    vec3 ro = vec3( 0 );
+    
+    if( iCam == false )
+    {
+        
+        ro = 0.2 * vec3( sin( iTime * 0.1 ), 0.0, cos( iTime * 0.1 ) );
+        
+    }
+    
+    else if( iCam != false )
+    {
+        
+        ro = vec3( 0.0, 0.2 * cos( iTime * 0.1  ), 1.0 + sin( iTime * 0.1 ) );
+        
+    }
+    
     vec3 ww = normalize( vec3( 0.0, 0.0, 0.0 ) - ro );
     vec3 uu = normalize( cross( vec3( 0.0, 1.0, 0.0 ), ww ) );
     vec3 vv = normalize( cross( ww, uu ) );
@@ -220,7 +230,7 @@ void main( )
     if( map( p, tra ).y == 1.0 )
         
         rd = normalize( reflect( rd, n ) );
-    ro = p + rd * EPS;
+        ro = p + rd * EPS;
     
     if( d < EPS ) col = shad( ro, rd );
 #else

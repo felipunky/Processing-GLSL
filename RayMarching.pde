@@ -1,29 +1,49 @@
 PShader shader;
 PShader shaderOne;
 
-boolean fillVal;
-boolean cam;
+boolean fillVal = false;
+boolean cam = false;
 
 void keyPressed() {
-  if (key == '2') 
+  if (key == '1') 
   {
     
-    fillVal = true;
+    fillVal = false;
     println( "fillVal = " + fillVal );
     
   } 
-  else if (key == '1') 
+  else if (key == '2') 
   {
-      fillVal = false;
+      fillVal = true;
       println( "fillVal = " + fillVal );
       
-      } 
-      else
-      {
-        
-        fillVal = false;
-      
+  } 
+    
+  if( cam == false )
+  {
+  
+    if( key == 'c' || key == 'C' )
+    {
+    
+      cam = true;
+      println( "Cam = " + cam );
+    
     }
+  
+  }
+  
+  else if( cam == true )
+  {
+  
+    if( key == 'c' || key == 'C' )
+    {
+    
+      cam = false;
+      println( "Cam = " + cam );
+    
+    }
+  
+  }
     
 }
 
@@ -44,6 +64,8 @@ void draw() {
   shaderOne.set("iResolution", float(width), float(height));
   shaderOne.set("iMouse", float(mouseX), float(mouseY));
   shaderOne.set("iTime", millis() / 1000.0);
+  shaderOne.set("iCam", cam);
+  
   shader(shader);
 
   if( fillVal == true )
