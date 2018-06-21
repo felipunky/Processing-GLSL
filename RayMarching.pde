@@ -1,5 +1,6 @@
 PShader shader;
 PShader shaderOne;
+PImage noise;
 
 boolean fillVal = false;
 boolean cam = false;
@@ -51,6 +52,8 @@ void setup() {
   size(800, 450, P2D);
   noStroke();
   
+  noise = loadImage("Noise.png");
+  textureWrap(Texture.REPEAT);
   //shader = loadShader("SDFOne.glsl");  
   shader = loadShader("SDF.glsl");
   shaderOne = loadShader("RayMarching.glsl");
@@ -58,6 +61,7 @@ void setup() {
 }
 
 void draw() {
+  shader.set("iChannel0", noise);
   shader.set("iResolution", float(width), float(height));
   shader.set("iMouse", float(mouseX), float(mouseY));
   shader.set("iTime", millis() / 1000.0);

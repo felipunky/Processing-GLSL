@@ -5,12 +5,14 @@ precision mediump float;
 uniform vec2 iResolution;
 uniform vec2 iMouse;
 uniform float iTime;
+uniform sampler2D iChannel0;
 
 #define EPS          0.002
 #define STEPS          128
 #define FAR           30.0
 #define PI    acos( -1.0 )
 #define TAU  atan(1.0)*8.0
+#define HASHSCALE    .1031
 
 mat2 rot( float a )
 {
@@ -21,40 +23,24 @@ mat2 rot( float a )
     
 }
 
-float hash( float n )
+float hash(float p)
 {
-    
-    return fract( sin( n ) * 45843.349 );
-    
+    vec3 p3  = fract(vec3(p) * HASHSCALE);
+    p3 += dot(p3, p3.yzx + 19.19);
+    return fract((p3.x + p3.y) * p3.z);
 }
+
+// iq's
 
 float noise( in vec3 x )
 {
+    vec3 p = floor(x);
+    vec3 f = fract(x);
+    f = f*f*(3.0-2.0*f);
     
-    vec3 p = floor( x );
-    vec3 k = fract( x );
-    
-    k *= k * k * ( 3.0 - 2.0 * k );
-    
-    float n = p.x + p.y * 57.0 + p.z * 113.0;
-    
-    float a = hash( n );
-    float b = hash( n + 1.0 );
-    float c = hash( n + 57.0 );
-    float d = hash( n + 58.0 );
-    
-    float e = hash( n + 113.0 );
-    float f = hash( n + 114.0 );
-    float g = hash( n + 170.0 );
-    float h = hash( n + 171.0 );
-    
-    float res = mix( mix( mix ( a, b, k.x ), mix( c, d, k.x ), k.y ),
-                    mix( mix ( e, f, k.x ), mix( g, h, k.x ), k.y ),
-                    k.z
-                    );
-    
-    return res;
-    
+    vec2 uv = (p.xy+vec2(37.0,17.0)*p.z) + f.xy;
+    vec2 rg = textureLod( iChannel0, (uv+ 0.5)/256.0, 0.0 ).yx;
+    return mix( rg.x, rg.y, f.z );
 }
 
 float fbm( in vec3 p )
