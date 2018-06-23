@@ -6,6 +6,8 @@ uniform vec2 iResolution;
 uniform vec2 iMouse;
 uniform float iTime;
 uniform sampler2D iChannel0;
+uniform float iForward;
+uniform float iSide;
 
 #define EPS          0.002
 #define STEPS          128
@@ -398,7 +400,7 @@ void main( )
     if( mou.x == 0.0 )
         ro = 5.0 * vec3( sin( -2.0 + iTime * 0.2 ), mou.y, cos( 2.0 + iTime * 0.2 ) );
     else if( mou.x != 0.0 )
-        ro = 5.0 * vec3( sin( mou.x * PI * 2.0 ), mou.y, cos( -mou.x * PI * 2.0 ) );
+        ro = iForward * vec3( sin( mou.x * PI * 2.0 ), mou.y, cos( -mou.x * PI * 2.0 ) );
     vec3 ww = normalize( vec3( 0.0 ) - ro );
     vec3 uu = normalize( cross( vec3( 0.0, 1.0, 0.0 ), ww ) );
     vec3 vv = normalize( cross( ww, uu ) );

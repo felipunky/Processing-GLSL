@@ -2,15 +2,18 @@
 precision mediump float;
 #endif
 
-#define PROCESSING_COLOR_SHADER
+#define TEXTURE
 
 uniform vec2 iResolution;
 uniform vec2 iMouse;
 uniform float iTime;
 uniform bool iCam;
+uniform samplerCube iChannel0;
+uniform float iForward;
+uniform float iSide;
 
 #define EPS      0.0001
-#define STEPS       100
+#define STEPS       128
 #define FAR       10.0
 #define PI acos( -1.0 )
 #define TPI    PI * 2.0
@@ -151,6 +154,7 @@ vec3 shad( vec3 ro, vec3 rd )
     vec3 lig = normalize( vec3( 1.0, 0.8, 0.6 ) );
     vec3 blig = normalize( -lig );
     vec3 ref = reflect( rd, n );
+    vec3 tex = texture( iChannel0, ref ).rgb;
     
     float sha = softShadows( p, lig );
     float con =  1.0 ;
@@ -178,6 +182,7 @@ vec3 shad( vec3 ro, vec3 rd )
         col += 0.2 * vec3( 0.1, 0.2, 0.3 );
 #ifdef REFLECTIONS
 #else
+        col += 0.5 * tex;
 #endif
 #ifdef COLOR
         col -= 1.0 * vec3( 0.5 );
@@ -202,7 +207,7 @@ void main( )
     if( iCam == false )
     {
         
-        ro = 0.2 * vec3( sin( iTime * 0.1 ), 0.0, cos( iTime * 0.1 ) );
+        ro = iForward * vec3( sin( iTime * 0.1 + mou.x * TPI ), 0.0, cos( iTime * 0.1 + -mou.x * TPI ) );
         
     }
     
