@@ -132,7 +132,7 @@ float ray( vec3 ro, vec3 rd, out float d )
     for( int i = 0; i < STEPS; ++i )
     {
         
-        d = 0.5 * map( ro + rd * t, tra ).x;
+        d = map( ro + rd * t, tra ).x;
         if( d < EPS || t > FAR ) break;
         t += d;
         
@@ -207,7 +207,7 @@ void main( )
     if( iCam == false )
     {
         
-        ro = iForward * vec3( sin( iTime * 0.1 + mou.x * TPI ), 0.0, cos( iTime * 0.1 + -mou.x * TPI ) );
+        ro = vec3( sin( iTime * 0.1 ), 0.0, cos( iTime * 0.1 ) );
         
     }
     

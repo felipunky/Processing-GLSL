@@ -5,12 +5,28 @@ PShader shader;
 PShader shaderOne;
 PShader shaderTwo;
 PShader shaderThree;
+PShader shaderFour;
 PImage noise;
 PImage cubeMap;
 
 int sha = 0;
 float forw = 0.0;
+boolean forY = false;
+boolean forNY = false;
 float sid = 0.0;
+boolean sidX = false;
+boolean sidNX = false;
+float spa = 0.0;
+boolean spac = false;
+boolean spacD = false;
+boolean con = false;
+boolean sup = false;
+float conX = 0.0;
+float conY = 0.0;
+float rotX = 0.0;
+float rotY = 0.0;
+float rate = 0.01;
+float spee = 0.5;
 boolean cam = false;
 
 void keyPressed() {
@@ -42,6 +58,13 @@ void keyPressed() {
       
   }
   
+  else if (key == '5') 
+  {
+      sha = 5;
+      println( "Shader number = " + sha );
+      
+  }
+  
   if( cam == false )
   {
   
@@ -68,58 +91,175 @@ void keyPressed() {
   
   }
   
-  if( key == CODED )
+  if( key == 'w'|| key == 'W' )
   {
     
-    if( keyCode == UP )
-    {
-    
-      forw -= 0.5;
-      println( forw );
-    
-    }
-    
+    forY = true;
+  
   }
   
-  if( key == CODED )
+  if( key == 's'|| key == 'S' )
   {
-    
-    if( keyCode == DOWN )
-    {
-    
-      forw += 0.5;
-      println( forw );
-    
-    }
-    
+  
+    forNY = true;
+  
+  }
+  
+  if( key == 'd'|| key == 'D' )
+  {
+  
+    sidX = true;
+  
+  }
+  
+  if( key == 'a'|| key == 'A' )
+  {
+  
+    sidNX = true;
+  
+  }
+  
+  if( key == ' ' )
+  {
+  
+    spac = true;
+  
   }  
   
   if( key == CODED )
   {
-    
-    if( keyCode == RIGHT )
+  
+    if( keyCode == SHIFT )
     {
-    
-      sid += 0.05;
-      println( sid );
+      
+      spacD = true;
     
     }
+  
+  } 
+  
+  if( key == CODED )
+  {
+  
+    if( keyCode == CONTROL )
+    {
+      
+      con = true;
     
-  }
+    }
+  
+  } 
+  
+  if ( sup == false )
+  {
 
-  if( key == CODED )
-  {
+    if ( key == 'm' || key == 'M' )
+    {
+
+      sup = true;
+      println( str( sup ) );
+      
+    }
     
-    if( keyCode == LEFT )
+  } 
+  
+  else if ( sup == true )
+  {
+
+    if ( key == 'm' || key == 'M' )
+    {
+
+      sup = false;
+      println( str( sup ) );
+      
+    }
+    
+  }
+    
+}
+
+void keyReleased()
+{
+
+  if( key == 'w'|| key == 'W' )
     {
     
-      sid -= 0.05;
-      println( sid );
+      forY = false;
     
     }
     
-  }  
+    if( key == 's'|| key == 'S' )
+    {
     
+      forNY = false;
+    
+    }
+    
+    if( key == 'd'|| key == 'D' )
+    {
+    
+      sidX = false;
+    
+    }
+    
+    if( key == 'a'|| key == 'A' )
+    {
+    
+      sidNX = false;
+    
+    }
+    
+    if( key == ' ' )
+    {
+  
+      spac = false;
+  
+    }   
+    
+    if( key == CODED )
+    {
+    
+      if( keyCode == SHIFT )
+      {
+        
+        spacD = false;
+      
+      }
+      
+    } 
+    
+    if( key == CODED )
+    {
+    
+      if( keyCode == CONTROL )
+      {
+        
+        con = false;
+      
+      }
+    
+    }
+
+}
+
+void mouseDragged() {
+  
+  if( con == false )
+  {
+  
+    rotX += (pmouseY-mouseY) * rate;
+    rotY += (mouseX-pmouseX) * rate;
+    
+  }
+  
+  else
+  {
+    
+    conX += (pmouseY-mouseY) * rate;
+    conY += (mouseX-pmouseX) * rate; 
+    
+  }
+  
 }
 
 void setup() {
@@ -136,6 +276,7 @@ void setup() {
   shaderOne = loadShader("RayMarching.glsl");
   shaderTwo = loadShader("RayMarchingOne.glsl");
   shaderThree = loadShader("Volumetrics.glsl");
+  shaderFour = loadShader("Move.glsl");
 
 }
 
@@ -144,9 +285,12 @@ void draw() {
   shader.set("iChannel0", noise);
   shader.set("iResolution", float(width), float(height));
   shader.set("iMouse", float(mouseX), float(mouseY));
+  shader.set("iMouse", rotX, rotY);
   shader.set("iTime", millis() / 1000.0);
   shader.set("iForward", forw);
   shader.set("iSide", sid);
+  shader.set("iUp", spa);
+  shader.set("iFractal", conX, conY);
   
   shaderOne.set("iResolution", float(width), float(height));
   shaderOne.set("iMouse", float(mouseX), float(mouseY));
@@ -167,6 +311,16 @@ void draw() {
   shaderThree.set("iResolution", float(width), float(height));
   shaderThree.set("iMouse", float(mouseX), float(mouseY));
   shaderThree.set("iTime", millis() / 1000.0);
+  
+  shaderFour.set("iResolution", float(width), float(height));
+  shaderFour.set("iMouse", rotX, rotY);
+  shaderFour.set("iTime", millis() / 1000.0);
+  shaderFour.set("iForward", forw);
+  shaderFour.set("iSide", sid);
+  shaderFour.set("iUp", spa);
+  shaderFour.set("iFractal", conX, conY);
+  shaderFour.set("iMSAA", sup);
+  shader(shader);
   
   shader(shader);
 
@@ -193,6 +347,56 @@ void draw() {
     shader(shaderThree);
     
   }  
+  
+  else if( sha == 5 )
+  {
+  
+    resetShader();
+    shader(shaderFour);
+    
+  }    
+  
+  if( forY == true )
+  {
+  
+    forw += spee;
+  
+  }
+  
+  if( forNY == true )
+  {
+  
+    forw -= spee;
+  
+  }  
+  
+  if( sidX == true )
+  {
+  
+    sid += spee;
+  
+  } 
+  
+  if( sidNX == true )
+  {
+  
+    sid -= spee;
+  
+  }
+  
+  if( spac == true )
+  {
+  
+    spa += spee;
+  
+  }  
+  
+  if( spacD == true )
+  {
+  
+    spa -= spee;
+  
+  }
   
   rect(0, 0, width, height);
   

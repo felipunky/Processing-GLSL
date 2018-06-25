@@ -3,11 +3,13 @@ precision mediump float;
 #endif
 
 uniform vec2 iResolution;
-uniform vec2 iMouse;
-uniform float iTime;
 uniform sampler2D iChannel0;
+uniform vec2 iMouse;
+uniform vec2 iFractal;
+uniform float iTime;
 uniform float iForward;
 uniform float iSide;
+uniform float iUp;
 
 #define EPS          0.002
 #define STEPS          128
@@ -257,11 +259,11 @@ float fBox(vec3 p, vec3 b)
 vec2 map( vec3 p )
 {
     
-    vec2 pla = vec2( p.y + 2.0 + fbm( p + iTime ) * 0.02, 0.0 );
+    vec2 pla = vec2( p.y + 2.0 + fbm( p + iTime * 0.01 ) * 0.02, 0.0 );
     vec3 pTem = p;
     pTem.xz = mod( p.xz, 5.0 ) - 2.5;
     vec2 sph = vec2( length( pTem ) - cos( iTime ), 3.0 );
-    pMirrorOctant( p.xz, vec2( iTime ) );
+    pMirrorOctant( p.xz, vec2( iFractal * 3.0 ) );
     pModMirror2( p.xz, vec2( 10.0, 8.0 ) );
     pModPolar( p.xz, 7.0 );
     p.x = -abs( p.x ) + 3.0;
@@ -294,7 +296,7 @@ vec2 map( vec3 p )
     vec2 fin = vec2( uni, 2.0 );
     if( roo.x < fin.x ) fin = roo;
     if( fin.x < pla.x ) pla = fin;
-    if( sph.x < pla.x ) pla = sph;
+    //if( sph.x < pla.x ) pla = sph;
     return pla;
     /*vec2 pla = vec2( p.y + 2.3, 0.0 );
      vec2 sph = vec2( length( p ) - 1.0, 1.0 );
@@ -308,8 +310,8 @@ vec3 norm( vec3 p )
     
     vec2 e = vec2( EPS, 0.0 );
     return normalize( vec3( map( p + e.xyy ).x - map( p - e.xyy ).x,
-                           map( p + e.yxy ).x - map( p - e.yxy ).x,
-                           map( p + e.yyx ).x - map( p - e.yyx ).x
+                            map( p + e.yxy ).x - map( p - e.yxy ).x,
+                            map( p + e.yyx ).x - map( p - e.yyx ).x
                            )
                      );
     
@@ -338,7 +340,7 @@ float ray( vec3 ro, vec3 rd, out float d )
     for( int i = 0; i < STEPS; ++i )
     {
         
-        d = 0.5 * map( ro + rd * t ).x;
+        d = map( ro + rd * t ).x;
         if( d < EPS || t > FAR ) break;
         t += d;
         
@@ -393,8 +395,10 @@ void main( )
     // Normalized pixel coordinates (from -1 to 1)
     vec2 uv = ( -iResolution.xy + 2.0 * gl_FragCoord.xy ) / iResolution.y;
     
+    /*
     vec2 mou = iMouse.xy / iResolution.xy;
     mou.y = clamp( mou.y,-TAU/4.0, 1.5 );
+    
     
     vec3 ro = vec3( 0.0 );
     if( mou.x == 0.0 )
@@ -406,6 +410,18 @@ void main( )
     vec3 vv = normalize( cross( ww, uu ) );
     vec3 rd = normalize( uv.x * uu + uv.y * vv + 1.5 * ww );
     //vec3 rd = normalize( vec3( uv, -1.0 ) );
+    */
+    
+    vec2 mou = vec2( -iMouse.x, iMouse.y );
+    
+    vec3 ro = vec3( iSide, iUp, -iForward );
+    vec3 rd = normalize( vec3( uv, -1.0 ) );
+    
+    ro.zy *= rot( mou.x );
+    ro.xz *= rot( mou.y );
+    
+    rd.zy *= rot( mou.x );
+    rd.xz *= rot( mou.y );
     
     float d = 0.0;
     float t = ray( ro, rd, d );
@@ -417,7 +433,7 @@ void main( )
     if( map( p ).y == 0.0 || map( p ).y == 3.0 )
         
         rd = normalize( reflect( rd, n ) );
-    ro = p + rd * 0.02;
+        ro = p + rd * 0.02;
     
     if( d < EPS )
         col += shad( ro, rd );
