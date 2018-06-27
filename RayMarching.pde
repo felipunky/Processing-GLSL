@@ -263,7 +263,7 @@ void mouseDragged() {
 }
 
 void setup() {
-  size(800, 450, P3D);
+  size(800, 450, P2D);
   noStroke();
   
   noise = loadImage("Noise.png");
